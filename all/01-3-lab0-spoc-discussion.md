@@ -18,9 +18,41 @@
 
 - 你理解的对于类似ucore这样需要进程/虚存/文件系统的操作系统，在硬件设计上至少需要有哪些直接的支持？至少应该提供哪些功能的特权指令？
 
+  - 进程：至少需要支持时钟中断；至少需要提供中断、异常、系统服务、调整特权级管理指令
+  - 虚存：至少需要支持MMU；至少需要提供MMU、分段(分页)管理指令
+  - 文件系统：至少需要稳定存储硬件；至少需要提供I/O操作指令
+
 - 你理解的x86的实模式和保护模式有什么区别？物理地址、线性地址、逻辑地址的含义分别是什么？
 
-- 你理解的risc-v的特权模式有什么区别？不同 模式在地址访问方面有何特征？
+  - 实模式&保护模式
+
+    实模式下物理内存地址能直接被程序访问，而保护模式下程序内部的地址（虚拟地址）要由操作系统转化为物理地址去访问，程序对此一无所知
+
+  - 物理地址
+
+    CPU在地址总线上给出地直接读写硬件存储器的地址
+
+  - 线性地址
+
+    在段机制下逻辑地址和物理地址之间变换的中间层
+
+  - 逻辑地址
+
+    应用程序的访存指令直接给出的虚拟地址
+
+- 你理解的risc-v的特权模式有什么区别？不同模式在地址访问方面有何特征？
+
+  risc-v架构定义了三种工作模式，又称特权模式（Privileged Mode）：
+
+  - Machine Mode：机器模式，简称M Mode。
+  - Supervisor Mode：监督模式，简称S Mode。
+  - User Mode：用户模式，简称U Mode。
+
+  risc-v架构定义M Mode为必选模式，另外两种为可选模式。通过不同的模式组合可以实现不同的系统。
+
+  risc-v架构也支持几种不同的存储器地址管理机制，包括对于物理地址和虚拟地址的管理机制，使得risc-v架构能够支持从简单的嵌入式系统（直接操作物理地址 M Mode, PMP unit）到复杂的操作系统（直接操作虚拟地址 S Mode）的各种系统。
+
+  https://content.riscv.org/wp-content/uploads/2017/05/riscv-privileged-v1.10.pdf
 
 - 理解ucore中list_entry双向链表数据结构及其4个基本操作函数和ucore中一些基于它的代码实现（此题不用填写内容）
 
@@ -39,6 +71,7 @@
     unsigned gd_off_31_16 : 16;        // high bits of offset in segment
  };
 ```
+  “:”后的数字表示每一个域在结构体中所占的位数
 
 - 对于如下的代码段，
 
@@ -63,6 +96,12 @@ SETGATE(intr, 1,2,3,0);
 ```
 请问执行上述指令后， intr的值是多少？
 
+运行测试[代码](https://github.com/Numanor/os_tutorial_lab/blob/master/x86-32/userapp_related/lab0_ex3.c)得到：
+
+```
+intr is 0x20003
+```
+
 ### 课堂实践练习
 
 #### 练习一
@@ -76,6 +115,7 @@ SETGATE(intr, 1,2,3,0);
 宏定义和引用在内核代码中很常用。请枚举ucore或rcore中宏定义的用途，并举例描述其含义。
 
 #### reference
+
  - [Intel格式和AT&T格式汇编区别](http://www.cnblogs.com/hdk1993/p/4820353.html)
  - [x86汇编指令集  ](http://hiyyp1234.blog.163.com/blog/static/67786373200981811422948/)
  - [PC Assembly Language, Paul A. Carter, November 2003.](https://pdos.csail.mit.edu/6.828/2016/readings/pcasm-book.pdf)
